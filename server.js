@@ -59,9 +59,24 @@ io.sockets.on("connection",function(socket){
                 player.y += player.speed;
             }
             else if(keypressed == "leftup"){
-                console.log("hi");
                 player.y -= player.speed;
                 player.x -= player.speed;
+            }
+            else if(keypressed == "rightup"){
+                player.y -= player.speed;
+                player.x += player.speed;
+            }
+            else if(keypressed == "leftdown"){
+                player.y += player.speed;
+                player.x -= player.speed;
+            }
+            else if(keypressed == "rightdown"){
+                player.y += player.speed;
+                player.x += player.speed;
+            }
+            else if(keypressed == "none"){
+                player.x = player.x;
+                player.y = player.y;
             }
             var index = gameState.Players.indexOf(player);
             gameState.Players[index] = player;

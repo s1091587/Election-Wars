@@ -38,24 +38,47 @@ var draw = function(gamestate){
 
 //check for keyevents and store in "keypressed" variable
 var keypressed;
+var keymap = {37: false, 38: false, 39: false, 40: false}
     $(document).keydown(function(e) {
-        if(e.which == 38 && e.which == 37) {
-            alert("hoi");
-          keypressed="leftup";
+        if(e.keyCode in keymap){
+            keymap[e.keyCode] = true;
         }
-       else if (e.which == 37) {
+        if(keymap[37] == true &&keymap[38] == true){
+            keypressed = "leftup";
+        }
+        else if(keymap[38] == true &&keymap[39] == true){
+            keypressed = "rightup";
+        }
+        else if(keymap[39] == true &&keymap[40] == true){
+            keypressed = "rightdown";
+        }
+        else if(keymap[37] == true &&keymap[40] == true){
+            keypressed = "leftdown";
+        }
+        else if(keymap[37]){
             keypressed = "left";
         }
-        else if (e.which == 39) {
-            keypressed = "right";
-        }
-        else if (e.which == 38) {
+        else if(keymap[38] == true){
             keypressed = "up";
         }
-        else if (e.which == 40) {
+        else if(keymap[39] == true){
+            keypressed = "right";
+        }
+        else if(keymap[40] == true){
             keypressed = "down";
         }
-    });
+        else{
+            keypressed = "none";
+        }
+        console.log(keypressed);
+    }).keyup(function (e) {
+        if(e.keyCode in keymap){
+            keymap[e.keyCode] = false;
+        }
+        if(keymap[37] == false && keymap[38] == false && keymap[39] == false && keymap[40] == false){
+            keypressed = "none";
+        }
+    })
 //server emits "updateRequest", client returns "updateResponse" with keypressed variable
 socket.on("updateRequest", function(){
     socket.emit("updateResponse", keypressed);
