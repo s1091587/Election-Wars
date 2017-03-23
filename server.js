@@ -32,6 +32,12 @@ function Player (name, color) {
     this.y = randomint(50,800);
     this.speed = 5;
   gameState.Players.push(this);
+<<<<<<< HEAD
+=======
+  gameState.Players.forEach(function(index, key){
+      console.log(index.name, index.color, index.x, index.y);
+  });
+>>>>>>> origin/Development
 };
 io.sockets.on("connection",function(socket){
     socket.on("join",function(data) {
@@ -60,4 +66,4 @@ var randomint = function(min, max)
 {
     range = (max - min) + 1;
     return Math.round((Math.random() * range) + min);
-}
+};
