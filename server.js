@@ -17,6 +17,7 @@ console.log("Server running");
  //Gameloop
  var FPS = 30;
  setInterval(function() {
+     io.sockets.emit("updateRequest");
  }, 1000/FPS);
 
 var gameState = {
@@ -29,15 +30,29 @@ function Player (name, color) {
     this.name = name;
     this.x = randomint(100,1200);
     this.y = randomint(50,800);
+    this.speed = 5;
   gameState.Players.push(this);
-  gameState.Players.forEach(function(index, key){
-      console.log(index.name, index.color, index.x, index.y);
-  })
 };
 io.sockets.on("connection",function(socket){
     socket.on("join",function(data) {
-        new Player(data.name, data.color);
+        var player = new Player(data.name, data.color);
         io.sockets.emit("update", gameState);
+    });
+    socket.on("updateResponse", function(keypressed){
+        if(keypressed == "left"){
+            player.x -= player.speed;
+        }
+        else if(keypressed == "right"){
+            player.x += player.speed;
+        }
+        else if(keypressed == "up"){
+            player.y -= player.speed;
+        }
+        else if(keypressed == "down"){
+            player.y += player.speed;
+        }
+        var index = gameState.Players.indexOf(player);
+        gameState.Players[index] = player;
     });
 });
 
