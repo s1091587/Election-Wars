@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="GameStyle.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+        <script src="jquery.hotkeys.js"></script> 
+        <script src="rotatePlugin.js"></script>
+        <script src="key_status.js"></script>
+        <script src="util.js"></script>
+        <script src="sprite.js"></script>
+        <script src="sound.js"></script>
+
+    </head>
+    <body>
+        <div id="join-form">
+                Nickname:<br><input id="name" type="text" name="nickname"><br>
+                Pick your color:<br><input id="color" type="color" name="favcolor" value="#ff0000"> 
+                <p><input id="submit" type="submit" value="submit"></p>
+        </div>   
+    </body>
+    <script src="GameScript.js"></script>
+</html>
