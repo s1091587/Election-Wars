@@ -15,7 +15,7 @@ app.get('/', function(req,res){
 var io = require("socket.io").listen(server);
 console.log("Server running");
  //Gameloop
- var FPS = 30;
+ var FPS = 120;
  setInterval(function() {
      io.sockets.emit("updateRequest");
  }, 1000/FPS);
@@ -25,40 +25,48 @@ var gameState = {
     Bullets: []
 };
 
-function Player (name, color) {
+function Player (name, color, id) {
+    this.id = id;
     this.color = color;
     this.name = name;
     this.x = randomint(100,1200);
     this.y = randomint(50,800);
     this.speed = 5;
   gameState.Players.push(this);
-<<<<<<< HEAD
-=======
-  gameState.Players.forEach(function(index, key){
-      console.log(index.name, index.color, index.x, index.y);
-  });
->>>>>>> origin/Development
 };
 io.sockets.on("connection",function(socket){
+    var player;
+    console.log(socket.id + " connected");
+    socket.on("disconnect", function(){
+            removePlayer(socket.id);
+            io.sockets.emit("update", gameState);
+    });
     socket.on("join",function(data) {
-        var player = new Player(data.name, data.color);
-        io.sockets.emit("update", gameState);
+        player = new Player(data.name, data.color, socket.id);
     });
     socket.on("updateResponse", function(keypressed){
-        if(keypressed == "left"){
-            player.x -= player.speed;
+        if(player) {
+            if (keypressed == "left") {
+                player.x -= player.speed;
+            }
+            else if (keypressed == "right") {
+                player.x += player.speed;
+            }
+            else if (keypressed == "up") {
+                player.y -= player.speed;
+            }
+            else if (keypressed == "down") {
+                player.y += player.speed;
+            }
+            else if(keypressed == "leftup"){
+                console.log("hi");
+                player.y -= player.speed;
+                player.x -= player.speed;
+            }
+            var index = gameState.Players.indexOf(player);
+            gameState.Players[index] = player;
+            io.sockets.emit("update", gameState);
         }
-        else if(keypressed == "right"){
-            player.x += player.speed;
-        }
-        else if(keypressed == "up"){
-            player.y -= player.speed;
-        }
-        else if(keypressed == "down"){
-            player.y += player.speed;
-        }
-        var index = gameState.Players.indexOf(player);
-        gameState.Players[index] = player;
     });
 });
 
@@ -67,3 +75,11 @@ var randomint = function(min, max)
     range = (max - min) + 1;
     return Math.round((Math.random() * range) + min);
 };
+var removePlayer = function(id){
+    gameState.Players.forEach(function(index,key){
+        if(index.id == id){
+            gameState.Players.splice(index, 1);
+        }
+        console.log(id + " disconnected");
+    })
+}

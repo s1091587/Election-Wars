@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    
 var socket = io.connect("localhost:8000");
 
 var CANVAS_WIDTH = 1200;
@@ -23,37 +22,40 @@ socket.on("update", function(gamestate){
     draw(gamestate);
 });
 
+
 //draw function
 var draw = function(gamestate){
+    canvas.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
     gamestate.Players.forEach(function(index, key){
         canvas.beginPath();
         canvas.arc(index.x, index.y, 25, 0, Math.PI*2);
         canvas.fillStyle = index.color;
+        canvas.font = "20px comic sans ms";
+        canvas.fillText(index.name, index.x-10, index.y-35);
         canvas.fill();
     });   
 };
 
 //check for keyevents and store in "keypressed" variable
 var keypressed;
-var FPS = 40;
-setInterval(function() {  
-  if (keydown.left) {
-    keypressed = "left";
-  }
-  if (keydown.right) {
-    keypressed = "right";
-  }
-  if (keydown.up) {
-    keypressed = "up";
-  }
-  if (keydown.down) {
-    keypressed = "down";
-  }
-  else{
-      keypressed = "none";
-  }
-}, 1000/FPS);
-
+    $(document).keydown(function(e) {
+        if(e.which == 38 && e.which == 37) {
+            alert("hoi");
+          keypressed="leftup";
+        }
+       else if (e.which == 37) {
+            keypressed = "left";
+        }
+        else if (e.which == 39) {
+            keypressed = "right";
+        }
+        else if (e.which == 38) {
+            keypressed = "up";
+        }
+        else if (e.which == 40) {
+            keypressed = "down";
+        }
+    });
 //server emits "updateRequest", client returns "updateResponse" with keypressed variable
 socket.on("updateRequest", function(){
     socket.emit("updateResponse", keypressed);
