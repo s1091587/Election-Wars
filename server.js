@@ -32,7 +32,7 @@ function Player (name, color) {
   gameState.Players.push(this);
   gameState.Players.forEach(function(index, key){
       console.log(index.name, index.color, index.x, index.y);
-  })
+  });
 };
 io.sockets.on("connection",function(socket){
     socket.on("join",function(data) {
@@ -45,4 +45,4 @@ var randomint = function(min, max)
 {
     range = (max - min) + 1;
     return Math.round((Math.random() * range) + min);
-}
+};

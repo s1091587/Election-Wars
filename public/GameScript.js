@@ -21,7 +21,7 @@ $("#submit").click(function() {
 
 socket.on("update", function(gamestate){
     draw(gamestate);
-})
+});
 
 //draw function
 var draw = function(gamestate){
@@ -30,10 +30,34 @@ var draw = function(gamestate){
         canvas.arc(index.x, index.y, 25, 0, Math.PI*2);
         canvas.fillStyle = index.color;
         canvas.fill();
-    });
-    
-    
+    });   
 };
+
+//check for keyevents and store in "keypressed" variable
+var keypressed;
+var FPS = 30;
+setInterval(function() {  
+  if (keydown.left) {
+    keypressed = "left";
+  }
+  if (keydown.right) {
+    keypressed = "right";
+  }
+  if (keydown.up) {
+    keypressed = "up";
+  }
+  if (keydown.down) {
+    keypressed = "down";
+  }
+  else{
+      keypressed = "none";
+  }
+}, 1000/FPS);
+
+//server emits "updateRequest", client returns "updateResponse" with keypressed variable
+socket.on("updateRequest", function(){
+    socket.emit("updateResponse", keypressed);
+});
 
 
 });
