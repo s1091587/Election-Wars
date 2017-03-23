@@ -35,7 +35,7 @@ var draw = function(gamestate){
 
 //check for keyevents and store in "keypressed" variable
 var keypressed;
-var FPS = 30;
+var FPS = 40;
 setInterval(function() {  
   if (keydown.left) {
     keypressed = "left";
