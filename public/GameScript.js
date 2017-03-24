@@ -30,19 +30,29 @@ socket.on("update", function(gamestate){
 var draw = function(gamestate){
     canvas.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
     gamestate.Players.forEach(function(index, key){
-        canvas.beginPath();
-        canvas.arc(index.x, index.y, 25, 0, Math.PI*2);
-        canvas.fillStyle = index.color;
-        canvas.font = "20px comic sans ms";
-        canvas.fillText(index.name, index.x-10, index.y-35);
-        canvas.fill();
-        canvas.endPa
+        if(index.active) {
+            canvas.beginPath();
+            canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
+            canvas.fillStyle = index.color;
+            canvas.fill();
+            canvas.fillStyle = "#000000";
+            canvas.fillRect(index.x - 40, index.y + 30, 75, 15);
+            if (index.hp >= 1) {
+                canvas.fillStyle = "#00ff00";
+                canvas.fillRect(index.x - 38, index.y + 32, 0.71 * index.hp, 11);
+            }
+            canvas.fillStyle = "#000000";
+            canvas.font = "18px comic sans ms";
+            canvas.fillText(index.name, index.x - 30, index.y - 35);
+        }
     });
     gamestate.Bullets.forEach(function(index,key){
-        canvas.beginPath();
-        canvas.arc(index.x, index.y, 10,0,Math.PI*2);
-        canvas.fillStyle = "#000000";
-        canvas.fill();
+        if(index.active == true) {
+            canvas.beginPath();
+            canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
+            canvas.fillStyle = "#000000";
+            canvas.fill();
+        }
     })
 
 };
@@ -51,33 +61,33 @@ var clicked;
 
 //check for keyevents and store in "keypressed" variable
 var keypressed;
-var keymap = {37: false, 38: false, 39: false, 40: false}
+var keymap = {65: false, 87: false, 68: false, 83: false}
     $(document).keydown(function(e) {
         if(e.keyCode in keymap){
             keymap[e.keyCode] = true;
         }
-        if(keymap[37] == true &&keymap[38] == true){
+        if(keymap[65] == true &&keymap[87] == true){
             keypressed = "leftup";
         }
-        else if(keymap[38] == true &&keymap[39] == true){
+        else if(keymap[87] == true &&keymap[68] == true){
             keypressed = "rightup";
         }
-        else if(keymap[39] == true &&keymap[40] == true){
+        else if(keymap[68] == true &&keymap[83] == true){
             keypressed = "rightdown";
         }
-        else if(keymap[37] == true &&keymap[40] == true){
+        else if(keymap[65] == true &&keymap[83] == true){
             keypressed = "leftdown";
         }
-        else if(keymap[37]){
+        else if(keymap[65]){
             keypressed = "left";
         }
-        else if(keymap[38] == true){
+        else if(keymap[87] == true){
             keypressed = "up";
         }
-        else if(keymap[39] == true){
+        else if(keymap[68] == true){
             keypressed = "right";
         }
-        else if(keymap[40] == true){
+        else if(keymap[83] == true){
             keypressed = "down";
         }
         else{
@@ -87,7 +97,7 @@ var keymap = {37: false, 38: false, 39: false, 40: false}
         if(e.keyCode in keymap){
             keymap[e.keyCode] = false;
         }
-        if(keymap[37] == false && keymap[38] == false && keymap[39] == false && keymap[40] == false){
+        if(keymap[65] == false && keymap[87] == false && keymap[68] == false && keymap[83] == false){
             keypressed = "none";
         }
     })
