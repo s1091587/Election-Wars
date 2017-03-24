@@ -8,13 +8,16 @@ var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
                       "' height='" + CANVAS_HEIGHT + "'></canvas>");
 var canvas = canvasElement.get(0).getContext("2d");
 canvasElement.appendTo('body');
-
 //form join function
 $("#submit").click(function() {
+    $("body").bind("click",function(e){
+        clicked = e;
+    });
     var data = {
         name : $("#name").val(),
         color : $("#color").val()
     };
+    $("#join-form").css("display", "none");
     socket.emit("join", data);
 });
 
@@ -33,8 +36,18 @@ var draw = function(gamestate){
         canvas.font = "20px comic sans ms";
         canvas.fillText(index.name, index.x-10, index.y-35);
         canvas.fill();
-    });   
+        canvas.endPa
+    });
+    gamestate.Bullets.forEach(function(index,key){
+        canvas.beginPath();
+        canvas.arc(index.x, index.y, 10,0,Math.PI*2);
+        canvas.fillStyle = "#000000";
+        canvas.fill();
+    })
+
 };
+
+var clicked;
 
 //check for keyevents and store in "keypressed" variable
 var keypressed;
@@ -70,7 +83,6 @@ var keymap = {37: false, 38: false, 39: false, 40: false}
         else{
             keypressed = "none";
         }
-        console.log(keypressed);
     }).keyup(function (e) {
         if(e.keyCode in keymap){
             keymap[e.keyCode] = false;
@@ -79,9 +91,26 @@ var keymap = {37: false, 38: false, 39: false, 40: false}
             keypressed = "none";
         }
     })
+    var gamedata;
 //server emits "updateRequest", client returns "updateResponse" with keypressed variable
 socket.on("updateRequest", function(){
-    socket.emit("updateResponse", keypressed);
+    if(clicked != null){
+        gamedata = {
+            keypressed: keypressed,
+            clickx: clicked.pageX,
+            clicky: clicked.pageY
+        };
+    }
+    else {
+        gamedata = {
+            keypressed: keypressed
+        };
+    }
+
+    socket.emit("updateResponse", gamedata);
+    gamedata.clickx = null;
+    gamedata.clicky = null;
+    clicked = null;
 });
 
 

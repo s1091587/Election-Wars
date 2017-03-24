@@ -34,55 +34,32 @@ function Player (name, color, id) {
     this.speed = 5;
   gameState.Players.push(this);
 };
+function Bullet(x, y, ex,ey, player){
+    this.x = x;
+    this.y = y;
+    this.speed = 10;
+    this.byTrump = false;
+    calculateVel(this,player,ex,ey);
+    gameState.Bullets.push(this);
+
+};
 io.sockets.on("connection",function(socket){
     var player;
+    var bullet;
     console.log(socket.id + " connected");
-    socket.on("disconnect", function(){
-            removePlayer(socket.id);
-            io.sockets.emit("update", gameState);
-    });
     socket.on("join",function(data) {
         player = new Player(data.name, data.color, socket.id);
     });
-    socket.on("updateResponse", function(keypressed){
-        if(player) {
-            if (keypressed == "left") {
-                player.x -= player.speed;
+    socket.on("updateResponse", function(gamedata){
+            updatePlayer(player,gamedata.keypressed);
+            if(gamedata.clickx != null){
+                bullet = new Bullet(player.x, player.y,gamedata.clickx, gamedata.clicky, player);
             }
-            else if (keypressed == "right") {
-                player.x += player.speed;
+            if(gameState.Bullets != null) {
+                updateBullets();
             }
-            else if (keypressed == "up") {
-                player.y -= player.speed;
-            }
-            else if (keypressed == "down") {
-                player.y += player.speed;
-            }
-            else if(keypressed == "leftup"){
-                player.y -= player.speed;
-                player.x -= player.speed;
-            }
-            else if(keypressed == "rightup"){
-                player.y -= player.speed;
-                player.x += player.speed;
-            }
-            else if(keypressed == "leftdown"){
-                player.y += player.speed;
-                player.x -= player.speed;
-            }
-            else if(keypressed == "rightdown"){
-                player.y += player.speed;
-                player.x += player.speed;
-            }
-            else if(keypressed == "none"){
-                player.x = player.x;
-                player.y = player.y;
-            }
-            var index = gameState.Players.indexOf(player);
-            gameState.Players[index] = player;
             io.sockets.emit("update", gameState);
-        }
-    });
+});
 });
 
 var randomint = function(min, max)
@@ -90,11 +67,58 @@ var randomint = function(min, max)
     range = (max - min) + 1;
     return Math.round((Math.random() * range) + min);
 };
-var removePlayer = function(id){
-    gameState.Players.forEach(function(index,key){
-        if(index.id == id){
-            gameState.Players.splice(index, 1);
+var updatePlayer = function(player,keypressed) {
+    if (player) {
+        if (keypressed == "left") {
+            player.x -= player.speed;
         }
-        console.log(id + " disconnected");
+        else if (keypressed == "right") {
+            player.x += player.speed;
+        }
+        else if (keypressed == "up") {
+            player.y -= player.speed;
+        }
+        else if (keypressed == "down") {
+            player.y += player.speed;
+        }
+        else if (keypressed == "leftup") {
+            player.y -= player.speed;
+            player.x -= player.speed;
+        }
+        else if (keypressed == "rightup") {
+            player.y -= player.speed;
+            player.x += player.speed;
+        }
+        else if (keypressed == "leftdown") {
+            player.y += player.speed;
+            player.x -= player.speed;
+        }
+        else if (keypressed == "rightdown") {
+            player.y += player.speed;
+            player.x += player.speed;
+        }
+        else if (keypressed == "none") {
+            player.x = player.x;
+            player.y = player.y;
+        }
+        var index = gameState.Players.indexOf(player);
+        gameState.Players[index] = player;
+    }
+}
+
+var calculateVel = function(bullet, player, ex,ey){
+    var dx = (ex -player.x);
+    var dy = (ey - player.y);
+    var mag = Math.sqrt(dx * dx + dy * dy);
+    bullet.velX = (dx / mag) * bullet.speed;
+    bullet.velY = (dy / mag) * bullet.speed;
+}
+var updateBullets = function() {
+    gameState.Bullets.forEach(function (index, key) {
+        var current = gameState.Bullets.indexOf(index);
+        index.x += index.velX;
+        index.y += index.velY;
+        gameState.Bullets[current] = index;
+
     })
 }
