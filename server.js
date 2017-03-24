@@ -29,6 +29,8 @@ var gameState = {
     Bullets: []
 };
 
+var readyPlayers = [];
+
 function Player (name, color, id) {
     this.active = true;
     this.id = id;
@@ -39,6 +41,7 @@ function Player (name, color, id) {
     this.y = randomint(50,800);
     this.speed = 5;
     this.radius = 25;
+    this.ready = false;
   gameState.Players.push(this);
   CollisionObjs.push(this);
 };
@@ -60,7 +63,9 @@ io.sockets.on("connection",function(socket){
     console.log(socket.id + " connected");
     socket.on("join",function(data) {
         player = new Player(data.name, data.color, socket.id);
+        socket.emit("playerlist", gameState.Players);
     });
+
     socket.on("updateResponse", function(gamedata){
             updatePlayer(player,gamedata.keypressed);
             if(gamedata.clickx != null && player != null) {
@@ -74,6 +79,32 @@ io.sockets.on("connection",function(socket){
            checkCollision();
             io.sockets.emit("update", gameState);
 });
+
+    
+    socket.on("pressedready", function(ready){
+        gameState.Players.forEach(function(index,key){
+            if(index.id == socket.id){
+                gameState.Players[key].ready = true;
+                if(index.ready = true){
+                   readyPlayers.push(index); 
+                }              
+            }
+        })
+        console.log(readyPlayers.length);
+        io.sockets.emit("players", gameState.Players)
+    })
+    
+    socket.on("updateResponse", function(gamedata){
+        updatePlayer(player,gamedata.keypressed);
+        if(gamedata.clickx != null){
+            bullet = new Bullet(player.x, player.y,gamedata.clickx, gamedata.clicky, player);
+        }
+        if(gameState.Bullets != null) {
+            updateBullets();
+        }
+        io.sockets.emit("update", gameState);
+    });
+
 });
 
 var randomint = function(min, max)

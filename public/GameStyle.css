@@ -18,3 +18,24 @@
     margin-right: -50%;
     transform: translate(-50%, -50%)
 }
+
+#lobby{
+    background-color: silver;
+    width: 250px;
+    height: 300px;
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    margin-right: -50%;
+    display: none;
+    transform: translate(-50%, -50%)       
+}
+
+#linotready{
+    color: red;
+}
+
+#liready{
+    color: green;
+}

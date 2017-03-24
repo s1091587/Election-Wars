@@ -1,6 +1,49 @@
 $(document).ready(function() {
 var socket = io.connect("localhost:8000");
 
+//get playerlist on every join
+socket.on("playerlist", function(playerlist){
+    //print joined player names in list
+    playerlist.forEach(function(index, key){
+        if (index.ready == false){           
+            $("#lobby ul").append('<li id="linotready">'+index.name+'</li>');          
+        }
+        else if (index.ready == true){         
+            $("#lobby ul").append('<li id="liready">'+index.name+'</li>');
+        }
+    });     
+});
+//print ready button
+$("#lobby").append('<button id="readybtn">Ready</button></li>');
+
+//emit to server if button "readybtn" is pressed
+$('#lobby').on('click', '#readybtn', function(){
+    console.log("ready button is pressed")
+    socket.emit("pressedready", true) 
+    $('button').remove('#readybtn'); 
+});
+
+//get new list of players with their updated status (happens after "readybtn" is clicked)
+socket.on("players", function(players){
+    //clear the UL before filling it again.
+    var ul = document.getElementById('ul1');
+        if (ul) {
+            while (ul.firstChild) {
+                    ul.removeChild(ul.firstChild);
+            }
+        }     
+    //print joined players names to list    
+    players.forEach(function(index, key){
+        if (index.ready == false){         
+            $("#lobby ul").append('<li id="linotready">'+index.name+'</li>');    
+        }
+        else if (index.ready == true){            
+            $("#lobby ul").append('<li id="liready">'+index.name+'</li>');
+            
+        }
+    });      
+})
+
 var CANVAS_WIDTH = 1200;
 var CANVAS_HEIGHT = 800;
 
@@ -8,7 +51,8 @@ var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
                       "' height='" + CANVAS_HEIGHT + "'></canvas>");
 var canvas = canvasElement.get(0).getContext("2d");
 canvasElement.appendTo('body');
-//form join function
+
+//handle join/submit button press
 $("#submit").click(function() {
     $("body").bind("click",function(e){
         clicked = e;
@@ -17,7 +61,13 @@ $("#submit").click(function() {
         name : $("#name").val(),
         color : $("#color").val()
     };
+    
+    //hide the join form
     $("#join-form").css("display", "none");
+    //show the lobby screen
+    $("#lobby").css("display", "inline");
+    socket.emit("clientisinlobby", data.name);
+    
     socket.emit("join", data);
 });
 
@@ -122,6 +172,7 @@ socket.on("updateRequest", function(){
     gamedata.clicky = null;
     clicked = null;
 });
+
 
 
 });
