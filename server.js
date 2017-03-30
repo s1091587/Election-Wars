@@ -113,10 +113,6 @@ io.sockets.on("connection",function(socket){
         io.sockets.emit("playersUpdatedStatus", gameState.Players)
         
     })
-<<<<<<< HEAD
-=======
-    
->>>>>>> origin/Development
 });
 
 var randomint = function(min, max)
