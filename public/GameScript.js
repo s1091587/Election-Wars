@@ -56,12 +56,12 @@ socket.on("playersUpdatedStatus", function(players){
 });
 var CANVAS_WIDTH = Background.width;
 var CANVAS_HEIGHT = Background.height;
-
-var canvasElement = $("<canvas width='" + CANVAS_WIDTH + 
+var canvasElement = $("<canvas id='canvas' width='" + CANVAS_WIDTH +
                       "' height='" + CANVAS_HEIGHT + "'></canvas>");
 var canvas = canvasElement.get(0).getContext("2d");
 var trumpImg = document.getElementById("trump");
-canvasElement.appendTo('body');
+var main = document.getElementById("main")
+canvasElement.appendTo(main);
 
 //handle join/submit button press
 $("#submit").click(function() {

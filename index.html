@@ -14,14 +14,19 @@ and open the template in the editor.
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
     </head>
     <body>
+        <div id="main">
+            <img src="images/SplashScreen.png" id="splash">
         <img id="trump" src="images/donald.png">
         <div id="join-form">
-                Nickname:<br><input id="name" type="text" name="nickname" maxlength="16" minlength="4"><br>
-                Pick your color:<br><input id="color" type="color" name="favcolor" value="#ff0000"> 
-                <p><input id="submit" type="submit" value="submit"></p>
-        </div> 
+            <table id="formtabel">
+                <tr><td><label class="formlabel">Nickname:</label></td><td><input id="name" type="text" name="nickname" maxlength="16" minlength="4"></td></tr>
+                <tr><td><label class="formlabel">Color:</label></td><td><input id="color" type="color" name="favcolor" value="#ff0000"></td></tr>
+                <tr><td colspan="2"><input id="submit" type="submit" value="submit"></td></tr>
+            </table>
+        </div>
         <div id="lobby">
             <ul id="ul1"></ul>
+        </div>
         </div>
     </body>
     <script src="jquery.hotkeys.js"></script>
