@@ -40,8 +40,9 @@ function Player (name, color, id) {
     this.x = randomint(100,1200);
     this.y = randomint(50,800);
     this.speed = 5;
-    this.radius = 25;
+    this.radius = 50;
     this.ready = false;
+    this.trump = true;
   gameState.Players.push(this);
   CollisionObjs.push(this);
 };
@@ -93,18 +94,6 @@ io.sockets.on("connection",function(socket){
         console.log(readyPlayers.length);
         io.sockets.emit("players", gameState.Players)
     })
-    
-    socket.on("updateResponse", function(gamedata){
-        updatePlayer(player,gamedata.keypressed);
-        if(gamedata.clickx != null){
-            bullet = new Bullet(player.x, player.y,gamedata.clickx, gamedata.clicky, player);
-        }
-        if(gameState.Bullets != null) {
-            updateBullets();
-        }
-        io.sockets.emit("update", gameState);
-    });
-
 });
 
 var randomint = function(min, max)
@@ -165,43 +154,41 @@ var calculateVel = function(bullet, player, ex,ey){
 }
 var updateBullets = function() {
     gameState.Bullets.forEach(function (index, key) {
-        if(index.active) {
             var current = gameState.Bullets.indexOf(index);
             index.x += index.velX;
             index.y += index.velY;
             gameState.Bullets[current] = index;
-        }
     })
 }
 var checkCollision = function() {
     CollisionObjs.forEach(function (index, key) {
-        if(index.active == true) {
             CollisionObjs.forEach(function (index2, key2) {
-                if(index2.active == true) {
                     var dx = index.x - index2.x;
                     var dy = index.y - index2.y;
                     var distance = Math.sqrt(dx * dx + dy * dy);
+
+                    //Bullet - Player collisions
                     if (distance < index.radius + index2.radius) {
-                        if (index instanceof Bullet && index2 instanceof Player && index.active) {
+                        if (index instanceof Bullet && index2 instanceof Player && index2.active) {
                             if (index.origin != index2.id) {
                                 var temp = gameState.Players.indexOf(index2);
                                 index2.hp -= bulletDamage;
                                 gameState.Players[temp] = index2;
-                                var bulleti = gameState.Bullets.indexOf(index);
-                                index.active = false;
-                                gameState.Bullets[bulleti] = bulleti;
+                                CollisionObjs.splice(CollisionObjs.indexOf(index),1);
+                                gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                             }
                         }
-                        if (index instanceof Player && index2 instanceof Bullet && index2.active) {
+                        if (index instanceof Player && index2 instanceof Bullet && index.active) {
                             if (index2.origin != index.id) {
                                 var temp = gameState.Players.indexOf(index);
                                 index.hp -= bulletDamage;
                                 gameState.Players[temp] = index;
-                                var bulleti = gameState.Bullets.indexOf(index2);
-                                index2.active = false;
-                                gameState.Bullets[bulleti] = bulleti;
+                                CollisionObjs.splice(CollisionObjs.indexOf(index2),1);
+                                gameState.Bullets.splice(gameState.Bullets.indexOf(index2),1);
                             }
                         }
+
+                        //Player - Player collisions
                         if (index instanceof Player && index2 instanceof Player) {
                             if (index != index2) {
                                 var temp = gameState.Players.indexOf(index);
@@ -237,40 +224,36 @@ var checkCollision = function() {
                             }
                         }
                     }
+
+                    //Object - Wall collisions
                     if (index.x <= index.radius) {
                         index.x += index.speed;
-                        if (index instanceof Bullet) {
-                            var bulleti = gameState.Bullets.indexOf(index2);
-                            index.active = false;
-                            gameState.Bullets[bulleti] = bulleti;
+                        if(index instanceof Bullet){
+                            CollisionObjs.splice(CollisionObjs.indexOf(index),1);
+                            gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                         }
                     }
                     if (index.x >= 1200 - index.radius) {
                         index.x -= index.speed;
-                        if (index instanceof Bullet) {
-                            var bulleti = gameState.Bullets.indexOf(index2);
-                            index.active = false;
-                            gameState.Bullets[bulleti] = bulleti;
+                        if(index instanceof Bullet){
+                            CollisionObjs.splice(CollisionObjs.indexOf(index),1);
+                            gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                         }
                     }
                     if (index.y <= index.radius) {
                         index.y += index.speed;
-                        if (index instanceof Bullet) {
-                            var bulleti = gameState.Bullets.indexOf(index2);
-                            index.active = false;
-                            gameState.Bullets[bulleti] = bulleti;
+                        if(index instanceof Bullet){
+                            CollisionObjs.splice(CollisionObjs.indexOf(index),1);
+                            gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                         }
                     }
                     if (index.y >= 800 - index.radius) {
                         index.y -= index.speed;
-                        if (index instanceof Bullet) {
-                            var bulleti = gameState.Bullets.indexOf(index2);
-                            index.active = false;
-                            gameState.Bullets[bulleti] = bulleti;
+                        if(index instanceof Bullet){
+                            CollisionObjs.splice(CollisionObjs.indexOf(index),1);
+                            gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                         }
                     }
-                }
             })
-        }
     })
 }

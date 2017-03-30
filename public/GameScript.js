@@ -50,6 +50,7 @@ var CANVAS_HEIGHT = 800;
 var canvasElement = $("<canvas width='" + CANVAS_WIDTH + 
                       "' height='" + CANVAS_HEIGHT + "'></canvas>");
 var canvas = canvasElement.get(0).getContext("2d");
+var trumpImg = document.getElementById("trump");
 canvasElement.appendTo('body');
 
 //handle join/submit button press
@@ -81,29 +82,44 @@ var draw = function(gamestate){
     canvas.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
     gamestate.Players.forEach(function(index, key){
         if(index.active) {
-            canvas.beginPath();
-            canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
-            canvas.fillStyle = index.color;
-            canvas.fill();
-            canvas.fillStyle = "#000000";
-            canvas.fillRect(index.x - 40, index.y + 30, 75, 15);
-            if (index.hp >= 1) {
-                canvas.fillStyle = "#00ff00";
-                canvas.fillRect(index.x - 38, index.y + 32, 0.71 * index.hp, 11);
+            if(index.trump){
+            canvas.drawImage(trumpImg, index.x-index.radius,index.y-index.radius);
+                canvas.fillStyle = "#000000";
+                canvas.fillRect(index.x - 40, index.y + 50, 75, 15);
+                if (index.hp >= 1) {
+                    canvas.fillStyle = "#ff0000";
+                    canvas.fillRect(index.x - 38, index.y + 52, 0.71 * index.hp, 11);
+                }
+                canvas.fillStyle = "#000000";
+                canvas.font = "18px comic sans ms";
+                canvas.fillText(index.name, index.x - 30, index.y - 35);
             }
-            canvas.fillStyle = "#000000";
-            canvas.font = "18px comic sans ms";
-            canvas.fillText(index.name, index.x - 30, index.y - 35);
+            else{
+                canvas.fillStyle = "#000000";
+                canvas.fillRect(index.x - 40, index.y + 30, 75, 15);
+                canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
+                canvas.fillStyle = index.color;
+                canvas.fill();
+                if (index.hp >= 1) {
+                    canvas.fillStyle = "#00ff00";
+                    canvas.fillRect(index.x - 38, index.y + 32, 0.71 * index.hp, 11);
+                }
+                canvas.fillStyle = "#000000";
+                canvas.font = "18px comic sans ms";
+                canvas.fillText(index.name, index.x - 30, index.y - 35);
+            }
         }
     });
     gamestate.Bullets.forEach(function(index,key){
-        if(index.active == true) {
-            canvas.beginPath();
-            canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
-            canvas.fillStyle = "#000000";
-            canvas.fill();
-        }
+            if(index != null) {
+                console.log(gamestate.Bullets.length);
+                canvas.beginPath();
+                canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
+                canvas.fillStyle = "#000000";
+                canvas.fill();
+            }
     })
+    gamestate = null;
 
 };
 
