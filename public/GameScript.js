@@ -1,3 +1,5 @@
+var Background = new Image();
+Background.src = "images/GameArena.png";
 $(document).ready(function() {
 var socket = io.connect("localhost:8000");
 
@@ -51,10 +53,9 @@ socket.on("playersUpdatedStatus", function(players){
             
         }
     });      
-})
-
-var CANVAS_WIDTH = 1200;
-var CANVAS_HEIGHT = 800;
+});
+var CANVAS_WIDTH = Background.width;
+var CANVAS_HEIGHT = Background.height;
 
 var canvasElement = $("<canvas width='" + CANVAS_WIDTH + 
                       "' height='" + CANVAS_HEIGHT + "'></canvas>");
@@ -90,15 +91,17 @@ socket.on("update", function(gamestate){
 //draw function
 var draw = function(gamestate){
     canvas.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
+    canvas.drawImage(Background,0,0);
     gamestate.Players.forEach(function(index, key){
         if(index.active) {
+            canvas.beginPath();
             if(index.trump){
             canvas.drawImage(trumpImg, index.x-index.radius,index.y-index.radius);
                 canvas.fillStyle = "#000000";
-                canvas.fillRect(index.x - 40, index.y + 50, 75, 15);
+                canvas.fillRect(index.x - 52, index.y + 50, (1/gamestate.Players.length)*index.maxhp + 4, 15);
                 if (index.hp >= 1) {
                     canvas.fillStyle = "#ff0000";
-                    canvas.fillRect(index.x - 38, index.y + 52, 0.71 * index.hp, 11);
+                    canvas.fillRect(index.x - 50, index.y + 52, (1/gamestate.Players.length) * index.hp, 11);
                 }
                 canvas.fillStyle = "#000000";
                 canvas.font = "18px comic sans ms";
@@ -106,13 +109,13 @@ var draw = function(gamestate){
             }
             else{
                 canvas.fillStyle = "#000000";
-                canvas.fillRect(index.x - 40, index.y + 30, 75, 15);
+                canvas.fillRect(index.x - 52, index.y + 30, 104, 15);
                 canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
                 canvas.fillStyle = index.color;
                 canvas.fill();
                 if (index.hp >= 1) {
                     canvas.fillStyle = "#00ff00";
-                    canvas.fillRect(index.x - 38, index.y + 32, 0.71 * index.hp, 11);
+                    canvas.fillRect(index.x - 50, index.y + 32, index.hp, 11);
                 }
                 canvas.fillStyle = "#000000";
                 canvas.font = "18px comic sans ms";

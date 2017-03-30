@@ -31,7 +31,7 @@ var gameState = {
     Players: [],
     Bullets: []
 };
-
+var gamestarted = false;
 //list of players that pressed ready
 var readyPlayers = [];
 
@@ -39,15 +39,16 @@ var readyPlayers = [];
 function Player (name, color, id) {
     this.active = true;
     this.id = id;
+    this.maxhp = 100;
     this.hp = 100;
     this.color = color;
     this.name = name;
     this.x = randomint(100,1200);
     this.y = randomint(50,800);
-    this.speed = 5;
-    this.radius = 50;
+    this.speed = 4;
+    this.radius = 25;
     this.ready = false;
-    this.trump = true;
+    this.trump = false;
   gameState.Players.push(this);
   CollisionObjs.push(this);
 };
@@ -80,20 +81,24 @@ io.sockets.on("connection",function(socket){
 
     socket.on("updateResponse", function(gamedata){
         //check if players are ready before sending gamedata and drawing everything.
-        if(readyPlayers.length == gameState.Players.length){
+        if(readyPlayers.length == gameState.Players.length && gamestarted == false &&  readyPlayers.length >= 1) {
+            chooseTrump();
+            console.log("#MAGA")
             io.sockets.emit("hideLobby");
-            updatePlayer(player,gamedata.keypressed);
-            if(gamedata.clickx != null && player != null) {
+            gamestarted = true;
+        }
+        else if(gamestarted) {
+            updatePlayer(player, gamedata.keypressed);
+            if (gamedata.clickx != null && player != null) {
                 if (player.active) {
                     bullet = new Bullet(gamedata.clickx, gamedata.clicky, player);
                 }
             }
-            if(gameState.Bullets != null ) {
-                    updateBullets();
+            if (gameState.Bullets != null) {
+                updateBullets();
             }
             checkCollision();
             io.sockets.emit("update", gameState);
-            
         }
     });
     
@@ -164,6 +169,16 @@ var updatePlayer = function(player,keypressed) {
     }
 }
 
+var chooseTrump = function(){
+    var trump = gameState.Players[Math.floor(Math.random() * gameState.Players.length)];
+    var index = gameState.Players.indexOf(trump);
+    trump.trump = true;
+    trump.radius = 50;
+    trump.maxhp = 100*(gameState.Players.length);
+    trump.hp = trump.maxhp;
+    gameState.Players[index] = trump;
+
+}
 var calculateVel = function(bullet, player, ex,ey){
     var dx = (ex -player.x);
     var dy = (ey - player.y);
@@ -266,7 +281,7 @@ var checkCollision = function() {
                             gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                         }
                     }
-                    if (index.y+40 >= 800 - index.radius) {
+                    if (index.y+30 >= 900 - index.radius) {
                         index.y -= index.speed;
                         if(index instanceof Bullet){
                             CollisionObjs.splice(CollisionObjs.indexOf(index),1);
