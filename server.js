@@ -259,14 +259,14 @@ var checkCollision = function() {
                             gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                         }
                     }
-                    if (index.y <= index.radius) {
+                    if (index.y-20 <= index.radius) {
                         index.y += index.speed;
                         if(index instanceof Bullet){
                             CollisionObjs.splice(CollisionObjs.indexOf(index),1);
                             gameState.Bullets.splice(gameState.Bullets.indexOf(index),1);
                         }
                     }
-                    if (index.y >= 800 - index.radius) {
+                    if (index.y+40 >= 800 - index.radius) {
                         index.y -= index.speed;
                         if(index instanceof Bullet){
                             CollisionObjs.splice(CollisionObjs.indexOf(index),1);

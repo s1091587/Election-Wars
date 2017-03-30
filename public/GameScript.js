@@ -102,7 +102,7 @@ var draw = function(gamestate){
                 }
                 canvas.fillStyle = "#000000";
                 canvas.font = "18px comic sans ms";
-                canvas.fillText(index.name, index.x - 30, index.y - 35);
+                canvas.fillText(index.name, index.x - 30, index.y - 60);
             }
             else{
                 canvas.fillStyle = "#000000";
