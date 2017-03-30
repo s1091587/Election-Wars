@@ -16,6 +16,11 @@ socket.on("playerlist", function(playerlist){
 //print ready button
 $("#lobby").append('<button id="readybtn">Ready</button></li>');
 
+//hide lobby when receiving the emit from server after all players pressed ready
+socket.on("hideLobby", function(){
+     $("#lobby").css("display", "none");
+})
+
 //variable for player data
 var data;
 

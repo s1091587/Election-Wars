@@ -80,6 +80,7 @@ io.sockets.on("connection",function(socket){
     socket.on("updateResponse", function(gamedata){
         //check if players are ready before sending gamedata and drawing everything.
         if(readyPlayers.length == 3){
+            socket.emit("hideLobby");
             updatePlayer(player,gamedata.keypressed);
             if(gamedata.clickx != null && player != null) {
                 if (player.active) {
@@ -91,6 +92,7 @@ io.sockets.on("connection",function(socket){
             }
             checkCollision();
             io.sockets.emit("update", gameState);
+            
         }
     });
     
