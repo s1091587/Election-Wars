@@ -80,8 +80,8 @@ io.sockets.on("connection",function(socket){
 
     socket.on("updateResponse", function(gamedata){
         //check if players are ready before sending gamedata and drawing everything.
-        if(readyPlayers.length == 3){
-            socket.emit("hideLobby");
+        if(readyPlayers.length == gameState.Players.length){
+            io.sockets.emit("hideLobby");
             updatePlayer(player,gamedata.keypressed);
             if(gamedata.clickx != null && player != null) {
                 if (player.active) {
