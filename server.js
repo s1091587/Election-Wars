@@ -17,20 +17,25 @@ app.get("*", function(req,res){
 });
 var io = require("socket.io").listen(server);
 console.log("Server running");
- //Gameloop
- var FPS = 120;
+
+//Gameloop
+var FPS = 120;
  setInterval(function() {
+     //send update request to the client
      io.sockets.emit("updateRequest");
- }, 1000/FPS);
- var bulletDamage = 5;
+}, 1000/FPS);
+
+var bulletDamage = 5;
 var CollisionObjs = []
 var gameState = {
     Players: [],
     Bullets: []
 };
 
+//list of players that pressed ready
 var readyPlayers = [];
 
+//player constructor
 function Player (name, color, id) {
     this.active = true;
     this.id = id;
@@ -46,6 +51,8 @@ function Player (name, color, id) {
   gameState.Players.push(this);
   CollisionObjs.push(this);
 };
+
+//bullet constructor
 function Bullet(ex,ey, player){
     this.active = true;
     this.origin = player.id;
@@ -62,12 +69,19 @@ io.sockets.on("connection",function(socket){
     var player;
     var bullet;
     console.log(socket.id + " connected");
+    
+    //get player data from the client after submit button clicked
     socket.on("join",function(data) {
         player = new Player(data.name, data.color, socket.id);
-        socket.emit("playerlist", gameState.Players);
+        socket.emit("playerlist", gameState.Players);     
+        //send new updated list of players to the client
+        io.sockets.emit("playersUpdatedStatus", gameState.Players)
     });
 
     socket.on("updateResponse", function(gamedata){
+        //check if players are ready before sending gamedata and drawing everything.
+        if(readyPlayers.length == 3){
+            socket.emit("hideLobby");
             updatePlayer(player,gamedata.keypressed);
             if(gamedata.clickx != null && player != null) {
                 if (player.active) {
@@ -77,11 +91,14 @@ io.sockets.on("connection",function(socket){
             if(gameState.Bullets != null ) {
                     updateBullets();
             }
-           checkCollision();
+            checkCollision();
             io.sockets.emit("update", gameState);
-});
-
+            
+        }
+    });
     
+
+    //listen if ready button is pressed by player and add player to list of ready players
     socket.on("pressedready", function(ready){
         gameState.Players.forEach(function(index,key){
             if(index.id == socket.id){
@@ -91,9 +108,15 @@ io.sockets.on("connection",function(socket){
                 }              
             }
         })
+        //send new updated list of players to the client
         console.log(readyPlayers.length);
-        io.sockets.emit("players", gameState.Players)
+        io.sockets.emit("playersUpdatedStatus", gameState.Players)
+        
     })
+<<<<<<< HEAD
+=======
+    
+>>>>>>> origin/Development
 });
 
 var randomint = function(min, max)

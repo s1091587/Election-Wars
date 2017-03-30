@@ -3,7 +3,7 @@ var socket = io.connect("localhost:8000");
 
 //get playerlist on every join
 socket.on("playerlist", function(playerlist){
-    //print joined player names in list
+    //print joined player names in list and check if they are ready or not (print names green/red)
     playerlist.forEach(function(index, key){
         if (index.ready == false){           
             $("#lobby ul").append('<li id="linotready">'+index.name+'</li>');          
@@ -16,7 +16,15 @@ socket.on("playerlist", function(playerlist){
 //print ready button
 $("#lobby").append('<button id="readybtn">Ready</button></li>');
 
-//emit to server if button "readybtn" is pressed
+//hide lobby when receiving the emit from server after all players pressed ready
+socket.on("hideLobby", function(){
+     $("#lobby").css("display", "none");
+})
+
+//variable for player data
+var data;
+
+//emit to server if button "readybtn" is pressed, send "true status" and remove the ready button.
 $('#lobby').on('click', '#readybtn', function(){
     console.log("ready button is pressed")
     socket.emit("pressedready", true) 
@@ -24,7 +32,7 @@ $('#lobby').on('click', '#readybtn', function(){
 });
 
 //get new list of players with their updated status (happens after "readybtn" is clicked)
-socket.on("players", function(players){
+socket.on("playersUpdatedStatus", function(players){
     //clear the UL before filling it again.
     var ul = document.getElementById('ul1');
         if (ul) {
@@ -58,18 +66,19 @@ $("#submit").click(function() {
     $("body").bind("click",function(e){
         clicked = e;
     });
-    var data = {
+    
+    //put color and name fields into variables
+    data = {
         name : $("#name").val(),
         color : $("#color").val()
     };
     
     //hide the join form
     $("#join-form").css("display", "none");
-    //show the lobby screen
+    //show the lobby screen with the player names
     $("#lobby").css("display", "inline");
-    socket.emit("clientisinlobby", data.name);
-    
-    socket.emit("join", data);
+    //send player data to server
+    socket.emit("join", data);  
 });
 
 socket.on("update", function(gamestate){
@@ -168,7 +177,7 @@ var keymap = {65: false, 87: false, 68: false, 83: false}
         }
     })
     var gamedata;
-//server emits "updateRequest", client returns "updateResponse" with keypressed variable
+//server emits "updateRequest", client returns "updateResponse" with new gamedata
 socket.on("updateRequest", function(){
     if(clicked != null){
         gamedata = {
