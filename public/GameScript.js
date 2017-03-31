@@ -16,7 +16,7 @@ socket.on("playerlist", function(playerlist){
     });     
 });
 //print ready button
-$("#lobby").append('<button id="readybtn">Ready</button>');
+$("#readybtndiv").append('<input id="readybtn" type="image" src="images/ReadyNormal.png">');
 
 //hide lobby when receiving the emit from server after all players pressed ready
 socket.on("hideLobby", function(){
