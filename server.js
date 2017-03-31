@@ -54,13 +54,13 @@ function Player (name, color, id) {
 };
 
 //bullet constructor
-function Bullet(ex,ey, player){
+function Bullet(ex,ey, player,trump){
     this.active = true;
     this.origin = player.id;
     this.x = player.x;
     this.y = player.y;
     this.speed = 10;
-    this.byTrump = false;
+    this.byTrump = trump;
     this.radius = 10;
     calculateVel(this,player,ex,ey);
     gameState.Bullets.push(this);
@@ -91,7 +91,7 @@ io.sockets.on("connection",function(socket){
             updatePlayer(player, gamedata.keypressed);
             if (gamedata.clickx != null && player != null) {
                 if (player.active) {
-                    bullet = new Bullet(gamedata.clickx, gamedata.clicky, player);
+                    bullet = new Bullet(gamedata.clickx, gamedata.clicky, player, player.trump);
                 }
             }
             if (gameState.Bullets != null) {
@@ -101,7 +101,14 @@ io.sockets.on("connection",function(socket){
             io.sockets.emit("update", gameState);
         }
     });
-    
+    socket.on("messagesent",function(message){
+        gameState.Players.forEach(function(index,key){
+            if(index.id == socket.id){
+                io.sockets.emit("syncmessage", index.name + ": " + message + "\n");
+            }
+        })
+
+    })
 
     //listen if ready button is pressed by player and add player to list of ready players
     socket.on("pressedready", function(ready){
@@ -204,7 +211,7 @@ var checkCollision = function() {
                     //Bullet - Player collisions
                     if (distance < index.radius + index2.radius) {
                         if (index instanceof Bullet && index2 instanceof Player && index2.active) {
-                            if (index.origin != index2.id) {
+                            if (index.origin != index2.id && (index.byTrump && !index2.trump || !index.byTrump && index2.trump)) {
                                 var temp = gameState.Players.indexOf(index2);
                                 index2.hp -= bulletDamage;
                                 gameState.Players[temp] = index2;
@@ -213,7 +220,7 @@ var checkCollision = function() {
                             }
                         }
                         if (index instanceof Player && index2 instanceof Bullet && index.active) {
-                            if (index2.origin != index.id) {
+                            if (index2.origin != index.id && (index2.byTrump && !index.trump || !index2.byTrump && index.trump)) {
                                 var temp = gameState.Players.indexOf(index);
                                 index.hp -= bulletDamage;
                                 gameState.Players[temp] = index;

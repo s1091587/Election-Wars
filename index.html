@@ -6,7 +6,7 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Election Wars</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="GameStyle.css">
@@ -15,19 +15,23 @@ and open the template in the editor.
     </head>
     <body>
         <div id="main">
-            <img src="images/SplashScreen.png" id="splash">
         <img id="trump" src="images/donald.png">
         <div id="join-form">
             <table id="formtabel">
                 <tr><td><label class="formlabel">Nickname:</label></td><td><input id="name" type="text" name="nickname" maxlength="16" minlength="4"></td></tr>
                 <tr><td><label class="formlabel">Color:</label></td><td><input id="color" type="color" name="favcolor" value="#ff0000"></td></tr>
-                <tr><td colspan="2"><input id="submit" type="submit" value="submit"></td></tr>
+                <tr><td colspan="2"><input id="submit" type="image" src="images/ButtonNormal.png"></td></tr>
             </table>
+        </div>
         </div>
         <div id="lobby">
             <ul id="ul1"></ul>
+            <textarea readonly disabled id="chatbox"></textarea><br>
+            <input type="text" id="messagebox" name="messagebox">
         </div>
-        </div>
+    <div id="game">
+        <canvas id='canvas' width="1200" height="900"></canvas>
+    </div>
     </body>
     <script src="jquery.hotkeys.js"></script>
     <script src="rotatePlugin.js"></script>

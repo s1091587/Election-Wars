@@ -21,8 +21,15 @@ $("#lobby").append('<button id="readybtn">Ready</button>');
 //hide lobby when receiving the emit from server after all players pressed ready
 socket.on("hideLobby", function(){
      $("#lobby").css("display", "none");
+     $("#game").css("display","block");
+});
+//syncs chatmessages received by the server to all clients
+socket.on("syncmessage",function(message){
+    console.log(message);
+    var chatbox = document.getElementById("chatbox")
+    chatbox.value += message;
+    chatbox.scrollTop = chatbox.scrollHeight;
 })
-
 //variable for player data
 var data;
 
@@ -54,20 +61,19 @@ socket.on("playersUpdatedStatus", function(players){
         }
     });      
 });
-var CANVAS_WIDTH = Background.width;
-var CANVAS_HEIGHT = Background.height;
-var canvasElement = $("<canvas id='canvas' width='" + CANVAS_WIDTH +
-                      "' height='" + CANVAS_HEIGHT + "'></canvas>");
+var canvasElement = $("#canvas");
 var canvas = canvasElement.get(0).getContext("2d");
+var CANVAS_WIDTH = 1200;
+var CANVAS_HEIGHT = 900;
 var trumpImg = document.getElementById("trump");
-var main = document.getElementById("main")
-canvasElement.appendTo(main);
-
+var main = document.getElementById("main");
+var pew = new Audio('sounds/shoot.wav');
 //handle join/submit button press
 $("#submit").click(function() {
-    $("body").bind("click",function(e){
-        clicked = e;
-    });
+    var theme = new Audio('sounds/ElectionWarsStartTheme.wav');
+    theme.play();
+    $("#main").css("display","none");
+    $("#lobby").css("display","block");
     
     //put color and name fields into variables
     data = {
@@ -78,7 +84,7 @@ $("#submit").click(function() {
     //hide the join form
     $("#join-form").css("display", "none");
     //show the lobby screen with the player names
-    $("#lobby").css("display", "inline");
+    $("#lobby").css("display", "block");
     //send player data to server
     socket.emit("join", data);  
 });
@@ -86,7 +92,12 @@ $("#submit").click(function() {
 socket.on("update", function(gamestate){
     draw(gamestate);
 });
-
+    $("#canvas").click(function(e){
+        pew.play();
+        clickedx = e.pageX - $('#game').offset().left;
+        clickedy = e.pageY - $('#game').offset().top;
+        console.log("X: " + e.pageX+ "Y: " + e.pageY)
+    });
 
 //draw function
 var draw = function(gamestate){
@@ -128,7 +139,12 @@ var draw = function(gamestate){
                 console.log(gamestate.Bullets.length);
                 canvas.beginPath();
                 canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
-                canvas.fillStyle = "#000000";
+                if(index.byTrump){
+                    canvas.fillStyle = "ff0000";
+                }
+                else {
+                    canvas.fillStyle = "#000000";
+                }
                 canvas.fill();
             }
     })
@@ -136,8 +152,14 @@ var draw = function(gamestate){
 
 };
 
-var clicked;
+var clickedx;
+var clickedy;
 
+$(document).keydown(function(e){
+        if(e.keyCode == 13){
+            sendChatMessage();
+        }
+    })
 //check for keyevents and store in "keypressed" variable
 var keypressed;
 var keymap = {65: false, 87: false, 68: false, 83: false}
@@ -183,11 +205,11 @@ var keymap = {65: false, 87: false, 68: false, 83: false}
     var gamedata;
 //server emits "updateRequest", client returns "updateResponse" with new gamedata
 socket.on("updateRequest", function(){
-    if(clicked != null){
+    if(clickedx != null){
         gamedata = {
             keypressed: keypressed,
-            clickx: clicked.pageX,
-            clicky: clicked.pageY
+            clickx: clickedx,
+            clicky: clickedy
         };
     }
     else {
@@ -199,9 +221,15 @@ socket.on("updateRequest", function(){
     socket.emit("updateResponse", gamedata);
     gamedata.clickx = null;
     gamedata.clicky = null;
-    clicked = null;
+    clickedx = null;
+    clickedy = null
 });
-
+var sendChatMessage = function(){
+    if($("input[name=messagebox]").val().length >= 1) {
+        socket.emit("messagesent", $("input[name=messagebox]").val());
+        document.getElementById("messagebox").value = "";
+    }
+}
 
 
 });
