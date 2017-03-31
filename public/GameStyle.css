@@ -109,3 +109,11 @@ ul {
 #ul1 li{
     margin-bottom: 5px;
 }
+#postgame{
+    display: none;
+    width: 1200px;
+    height: 900px;
+    margin: 0 auto;
+    text-align: center;
+    color: white;
+}

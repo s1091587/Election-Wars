@@ -2,7 +2,6 @@ var Background = new Image();
 Background.src = "images/GameArena.png";
 $(document).ready(function() {
 var socket = io.connect("localhost:8000");
-
 //get playerlist on every join
 socket.on("playerlist", function(playerlist){
     //print joined player names in list and check if they are ready or not (print names green/red)
@@ -25,7 +24,6 @@ socket.on("hideLobby", function(){
 });
 //syncs chatmessages received by the server to all clients
 socket.on("syncmessage",function(message){
-    console.log(message);
     var chatbox = document.getElementById("chatbox")
     chatbox.value += message;
     chatbox.scrollTop = chatbox.scrollHeight;
@@ -35,10 +33,9 @@ var data;
 
 //emit to server if button "readybtn" is pressed, send "true status" and remove the ready button.
 $('#lobby').on('click', '#readybtn', function(){
-    console.log("ready button is pressed")
     socket.emit("pressedready", true) 
     //remove ready button
-    $('button').remove('#readybtn'); 
+    $("#readybtn").css("display","none");
 });
 
 //get new list of players with their updated status (happens after "readybtn" is clicked)
@@ -74,19 +71,21 @@ $("#submit").click(function() {
     theme.play();
     $("#main").css("display","none");
     $("#lobby").css("display","block");
+    $("#readybtn").css("display","inline");
     
     //put color and name fields into variables
     data = {
         name : $("#name").val(),
         color : $("#color").val()
     };
-    
-    //hide the join form
-    $("#join-form").css("display", "none");
     //show the lobby screen with the player names
     $("#lobby").css("display", "block");
     //send player data to server
     socket.emit("join", data);  
+});
+$("#menubutton").click(function(){
+    $("#postgame").css("display","none");
+    $("#main").css("display","block");
 });
 
 socket.on("update", function(gamestate){
@@ -96,7 +95,6 @@ socket.on("update", function(gamestate){
         pew.play();
         clickedx = e.pageX - $('#game').offset().left;
         clickedy = e.pageY - $('#game').offset().top;
-        console.log("X: " + e.pageX+ "Y: " + e.pageY)
     });
 
 //draw function
@@ -136,7 +134,6 @@ var draw = function(gamestate){
     });
     gamestate.Bullets.forEach(function(index,key){
             if(index != null) {
-                console.log(gamestate.Bullets.length);
                 canvas.beginPath();
                 canvas.arc(index.x, index.y, index.radius, 0, Math.PI * 2);
                 if(index.byTrump){
@@ -230,6 +227,15 @@ var sendChatMessage = function(){
         document.getElementById("messagebox").value = "";
     }
 }
-
+socket.on("gameover",function(result){
+    $("#game").css("display","none");
+    $("#postgame").css("display","block");
+    if(result == "trump"){
+        $("#postgame").css("background-image", "url(images/trumpwin.png");
+    }
+    else if(result == "opposition"){
+        $("#postgame").css("background-image", "url(images/oppositionwin.png");
+    }
+})
 
 });

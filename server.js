@@ -22,7 +22,9 @@ console.log("Server running");
 var FPS = 120;
  setInterval(function() {
      //send update request to the client
+     if(gameState.Players.length >= 1){
      io.sockets.emit("updateRequest");
+     }
 }, 1000/FPS);
 
 var bulletDamage = 5;
@@ -31,6 +33,8 @@ var gameState = {
     Players: [],
     Bullets: []
 };
+var winner;
+var deadplayers = [];
 var gamestarted = false;
 //list of players that pressed ready
 var readyPlayers = [];
@@ -76,14 +80,13 @@ io.sockets.on("connection",function(socket){
         player = new Player(data.name, data.color, socket.id);
         socket.emit("playerlist", gameState.Players);     
         //send new updated list of players to the client
-        io.sockets.emit("playersUpdatedStatus", gameState.Players)
+        io.sockets.emit("playersUpdatedStatus", gameState.Players);
     });
 
     socket.on("updateResponse", function(gamedata){
         //check if players are ready before sending gamedata and drawing everything.
-        if(readyPlayers.length == gameState.Players.length && gamestarted == false &&  readyPlayers.length >= 1) {
+        if(readyPlayers.length == gameState.Players.length && gamestarted == false &&  readyPlayers.length >= 2) {
             chooseTrump();
-            console.log("#MAGA")
             io.sockets.emit("hideLobby");
             gamestarted = true;
         }
@@ -98,6 +101,12 @@ io.sockets.on("connection",function(socket){
                 updateBullets();
             }
             checkCollision();
+            checkDeaths();
+            if(winner != null){
+                io.sockets.emit("gameover", winner);
+                console.log(winner);
+                resetGame();
+            }
             io.sockets.emit("update", gameState);
         }
     });
@@ -120,8 +129,8 @@ io.sockets.on("connection",function(socket){
                 }              
             }
         })
+        io.sockets.emit("updateRequest");
         //send new updated list of players to the client
-        console.log(readyPlayers.length);
         io.sockets.emit("playersUpdatedStatus", gameState.Players)
         
     })
@@ -297,4 +306,28 @@ var checkCollision = function() {
                     }
             })
     })
+}
+var checkDeaths = function(){
+    gameState.Players.forEach(function(index,key){
+        if(index.hp <= 0 && !index.trump && deadplayers.indexOf(index)){
+            deadplayers.push(index);
+        }
+        if(deadplayers.length >= gameState.Players.length-1){
+            winner = "trump";
+        }
+        else if((index.trump && index.hp == 0)){
+            winner =  "opposition";
+        }
+    })
+}
+var resetGame = function(){
+    winner = null;
+    gameState.Players = [];
+    gameState.Bullets = [];
+    gamestarted = false;
+    CollisionObjs = [];
+    deadplayers = [];
+    readyPlayers = [];
+    bullet = null;
+    player = null;
 }
