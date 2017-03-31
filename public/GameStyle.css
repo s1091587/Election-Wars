@@ -109,12 +109,11 @@ ul {
     top: 30%;
     padding: 20px;
     min-width: 260px;
-    min-height: 400px
+    min-height: 300px
 }
 #ul1 li{
     margin-bottom: 5px;
 }
-<<<<<<< HEAD
 #postgame{
     display: none;
     width: 1200px;
@@ -123,13 +122,19 @@ ul {
     text-align: center;
     color: white;
 }
-=======
 #readybtn{
     width: 10%;
+    margin-left: 25%;
     position: inherit;
 }
 #readybtn:hover{
     width: 10%;
     opacity: 0.75;
 }
->>>>>>> origin/Development
+#menubutton{
+    margin-top: 60%;
+    width: 10%;
+}
+#menubutton:hover{
+    opacity: 0.75;
+}
