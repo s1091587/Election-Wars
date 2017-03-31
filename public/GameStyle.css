@@ -10,8 +10,8 @@ body{
     margin-right: auto;
 }
 #join-form{
-    position: absolute;
-    top:60%;
+    position: absolute;     
+    top: 60%;
     left: 50%;
 }
 #main{
@@ -63,11 +63,11 @@ body{
 }
 #submit{
     width: 40%;
-    height: 40%;
+    
 }
 #submit:hover{
     width: 40%;
-    height: 40%;
+    
     opacity: 0.75;
 }
 ul {
@@ -102,13 +102,19 @@ ul {
     width: 30%;
 }
 #ul1{
+    background-color: white;
+    opacity: 0.75;
     position: absolute;
     left: 30%;
     top: 30%;
+    padding: 20px;
+    min-width: 260px;
+    min-height: 400px
 }
 #ul1 li{
     margin-bottom: 5px;
 }
+<<<<<<< HEAD
 #postgame{
     display: none;
     width: 1200px;
@@ -117,3 +123,13 @@ ul {
     text-align: center;
     color: white;
 }
+=======
+#readybtn{
+    width: 10%;
+    position: inherit;
+}
+#readybtn:hover{
+    width: 10%;
+    opacity: 0.75;
+}
+>>>>>>> origin/Development
